@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asher-Link | Botshabelo Command</title>
+    <title>Asher-Link | Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
@@ -15,6 +15,8 @@
             color: #e4e4e7;
             overflow-x: hidden;
         }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
 
         .glass-panel {
             background: rgba(18, 18, 22, 0.8);
@@ -42,66 +44,63 @@
             filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.4));
         }
 
-        .login-transition {
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        .node-warning {
+            filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.4));
         }
 
-        .hidden-section {
-            display: none;
-            opacity: 0;
-            transform: translateY(10px);
+        .status-pulse {
+            animation: pulse 2s infinite;
         }
 
-        .active-section {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 0; }
         }
 
-        /* Tooltip styling */
+        .hidden-section { display: none; opacity: 0; transform: translateY(10px); }
+        .active-section { display: block; opacity: 1; transform: translateY(0); }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+
+        /* Interactive APs */
         .ap-node {
             position: absolute;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .ap-node:hover {
-            transform: scale(1.2);
+            transform: translate(-50%, -50%) scale(1.2);
             z-index: 50;
         }
 
         .ap-tooltip {
             position: absolute;
-            bottom: 120%;
+            bottom: 140%;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: bold;
-            white-space: nowrap;
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: #09090b;
+            padding: 12px;
+            border-radius: 12px;
+            width: 180px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
         }
 
-        .ap-node:hover .ap-tooltip {
-            opacity: 1;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+        .ap-node:hover .ap-tooltip { opacity: 1; }
     </style>
 </head>
-<body class="mesh-bg min-h-screen">
+<body class="mesh-bg min-h-screen custom-scrollbar">
 
     <!-- Auth Gateway -->
-    <div id="loginSection" class="fixed inset-0 z-50 flex items-center justify-center p-6 login-transition">
+    <div id="loginSection" class="fixed inset-0 z-50 flex items-center justify-center p-6 transition-all duration-700">
         <div class="glass-panel w-full max-w-md p-10 rounded-3xl shadow-2xl border border-white/5">
             <div class="mb-10 text-center">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 mb-6 shadow-lg shadow-blue-500/20">
@@ -110,263 +109,362 @@
                     </svg>
                 </div>
                 <h1 class="text-3xl font-bold tracking-tight text-white">Asher-Link</h1>
-                <p class="text-zinc-500 mt-2 font-light">Network Console</p>
+                <p class="text-zinc-500 mt-2 font-light">Network admin</p>
             </div>
 
             <form id="loginForm" class="space-y-5">
                 <div class="space-y-2">
-                    <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider ml-1">Officer Credentials</label>
-                    <input type="email" value="ops@asher-link.net" class="w-full bg-zinc-900/50 border border-zinc-800/50 rounded-xl px-4 py-3.5 text-white transition-all focus:ring-2 focus:ring-blue-500/50" placeholder="Email Address">
+                    <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider ml-1">Admin ID</label>
+                    <input type="email" value="ops@asher-link.net" class="w-full bg-zinc-900/50 border border-zinc-800/50 rounded-xl px-4 py-3.5 text-white transition-all focus:ring-2 focus:ring-blue-500/50">
                 </div>
                 <div class="space-y-2">
-                    <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider ml-1">Access Token</label>
-                    <input type="password" value="password" class="w-full bg-zinc-900/50 border border-zinc-800/50 rounded-xl px-4 py-3.5 text-white transition-all focus:ring-2 focus:ring-blue-500/50" placeholder="••••••••">
+                    <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider ml-1">Secure Token</label>
+                    <input type="password" value="password" class="w-full bg-zinc-900/50 border border-zinc-800/50 rounded-xl px-4 py-3.5 text-white transition-all focus:ring-2 focus:ring-blue-500/50">
                 </div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all shadow-xl shadow-blue-600/20 active:scale-[0.98]">
-                    Initialize Command
+                    Sign in
                 </button>
             </form>
-            <div class="mt-8 text-center">
-                <p class="text-[10px] text-zinc-600 uppercase tracking-[0.2em]">Deployment: Botshabelo Section K/L</p>
-            </div>
         </div>
     </div>
 
     <!-- Main Dashboard -->
     <div id="dashboardSection" class="hidden-section min-h-screen transition-all duration-1000">
         
-        <!-- Sidebar Navigation -->
-        <aside class="fixed left-0 top-0 h-full w-20 lg:w-64 border-r border-white/5 bg-black/40 backdrop-blur-xl z-40 flex flex-col items-center lg:items-stretch p-4">
-            <div class="mb-12 lg:px-4 py-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shrink-0">
-                        <span class="font-bold text-xl">A</span>
-                    </div>
-                    <span class="hidden lg:block font-bold text-xl tracking-tight">ASHER-LINK</span>
+        <!-- Sidebar -->
+        <aside class="fixed left-0 top-0 h-full w-64 border-r border-white/5 bg-black/40 backdrop-blur-xl z-40 hidden lg:flex flex-col p-6">
+            <div class="flex items-center gap-3 mb-12">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30">
+                    <span class="font-bold text-xl text-white">A</span>
                 </div>
+                <span class="font-bold text-xl tracking-tight text-white">ASHER-LINK</span>
             </div>
             
-            <nav class="flex-1 space-y-2">
+            <nav class="flex-1 space-y-1">
+                <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4 px-4">Network Ops</p>
                 <a href="#" class="flex items-center gap-4 px-4 py-3 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                    <span class="hidden lg:block font-medium">Network Map</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                    <span class="font-medium">Network Map</span>
                 </a>
                 <a href="#" class="flex items-center gap-4 px-4 py-3 rounded-xl text-zinc-500 hover:bg-white/5 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    <span class="hidden lg:block font-medium">Active Clusters</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    <span class="font-medium">Traffic Analytics</span>
                 </a>
                 <a href="#" class="flex items-center gap-4 px-4 py-3 rounded-xl text-zinc-500 hover:bg-white/5 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                    <span class="hidden lg:block font-medium">User Management</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    <span class="font-medium">Captive Portals</span>
+                </a>
+                <a href="#" class="flex items-center gap-4 px-4 py-3 rounded-xl text-zinc-500 hover:bg-white/5 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /></svg>
+                    <span class="font-medium">Core Settings</span>
                 </a>
             </nav>
 
-            <div class="mt-auto lg:p-4">
-                <button id="logoutBtn" class="flex items-center gap-4 w-full px-4 py-3 rounded-xl text-zinc-600 hover:text-red-400 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
-                    <span class="hidden lg:block font-medium">Sign Out</span>
+            <div class="mt-auto pt-6 border-t border-white/5">
+                <div class="flex items-center gap-3 p-2 bg-white/5 rounded-2xl mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center text-blue-500 font-bold">JD</div>
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-sm font-bold truncate">Ernest L.</p>
+                        <p class="text-[10px] text-zinc-500 uppercase">Super Admin</p>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-zinc-500 hover:text-red-400 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
+                    <span class="font-medium">Sign Out</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="lg:ml-64 p-6 lg:p-10 space-y-10">
+        <main class="lg:ml-64 p-6 lg:p-10 space-y-8">
             
-            <!-- Botshabelo Stats -->
-            <header class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <!-- Global Header -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
-                    <p class="text-zinc-500">Main Network</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="glass-panel px-6 py-3 rounded-xl border-emerald-500/20">
-                        <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Uptime</p>
-                        <p class="text-emerald-500 font-bold">99.98%</p>
+                    <h2 class="text-3xl font-bold tracking-tight">System Command</h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <p class="text-zinc-500 text-sm font-medium">Network is Healthy</p>
                     </div>
                 </div>
-            </header>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass-panel p-6 rounded-2xl">
-                    <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-1">Active Nodes</p>
-                    <h4 class="text-4xl font-bold">10 <span class="text-lg text-emerald-500">/ 10</span></h4>
-                </div>
-                <div class="glass-panel p-6 rounded-2xl">
-                    <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-1">Regional Clusters</p>
-                    <h4 class="text-4xl font-bold">02</h4>
-                </div>
-                <div class="glass-panel p-6 rounded-2xl">
-                    <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-1">Connected Users</p>
-                    <h4 class="text-4xl font-bold">1,420</h4>
+                <div class="flex items-center gap-3">
+                    <button class="px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all font-semibold text-sm">Download Logs</button>
+                    <button class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 rounded-xl shadow-lg shadow-blue-600/20 transition-all font-semibold text-sm">+ Add Node</button>
                 </div>
             </div>
 
-            <!-- Topology Visualization -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                <div class="lg:col-span-8 space-y-6">
-                    <div class="flex items-center justify-between px-2">
-                        <h3 class="text-xl font-bold">Network Infrastructure</h3>
-                        <div class="text-xs text-zinc-500 font-mono">Region: BOT-ZA-FS</div>
+            <!-- Critical Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="glass-panel p-6 rounded-2xl border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest">Total Users</p>
+                        <svg class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     </div>
-                    
-                    <div class="glass-panel rounded-3xl p-4 lg:p-10 relative overflow-hidden h-[550px] border border-white/5">
-                        <svg class="absolute inset-0 w-full h-full pointer-events-none">
-                            <line x1="50%" y1="15%" x2="30%" y2="45%" class="topology-line" />
-                            <line x1="50%" y1="15%" x2="70%" y2="45%" class="topology-line" />
+                    <h4 class="text-3xl font-bold">1,420</h4>
+                    <p class="text-[10px] text-emerald-500 font-bold mt-1">↑ 12% from yesterday</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border-l-4 border-emerald-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest">Aggregate BW</p>
+                        <svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    </div>
+                    <h4 class="text-3xl font-bold">2.4 <span class="text-sm">Gbps</span></h4>
+                    <p class="text-[10px] text-zinc-500 font-medium mt-1">Uplink: 10Gbps</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border-l-4 border-orange-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest">Avg Latency</p>
+                        <svg class="h-4 w-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <h4 class="text-3xl font-bold">14 <span class="text-sm">ms</span></h4>
+                    <p class="text-[10px] text-zinc-500 font-medium mt-1">Link Core</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border-l-4 border-purple-500">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest">User Devices</p>
+                        <svg class="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    </div>
+                    <h4 class="text-3xl font-bold">89% <span class="text-sm text-zinc-500">Mobile</span></h4>
+                    <p class="text-[10px] text-zinc-500 font-medium mt-1">iOS: 320 | Android: 1,100</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Infrastructure & Map -->
+                <div class="lg:col-span-8 space-y-8">
+                    <div class="glass-panel rounded-3xl overflow-hidden border border-white/10">
+                        <div class="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
+                            <h3 class="font-bold flex items-center gap-2">
+                                <svg class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+                                Logical Topology: Botshabelo F-K/J
+                            </h3>
+                            <div class="flex gap-2">
+                                <span class="px-2 py-1 rounded-md bg-zinc-900 text-[10px] mono text-zinc-400 uppercase tracking-tighter">Lat: -29.24</span>
+                                <span class="px-2 py-1 rounded-md bg-zinc-900 text-[10px] mono text-zinc-400 uppercase tracking-tighter">Lon: 26.71</span>
+                            </div>
+                        </div>
+                        
+                        <div class="relative h-[600px] bg-[#09090b] overflow-hidden p-10">
+                            <!-- Background Map Simulation -->
+                            <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#3b82f6 0.5px, transparent 0.5px); background-size: 24px 24px;"></div>
                             
-                            <!-- Cluster 1 APs -->
-                            <line x1="30%" y1="45%" x2="15%" y2="75%" class="topology-line" />
-                            <line x1="30%" y1="45%" x2="25%" y2="75%" class="topology-line" />
-                            <line x1="30%" y1="45%" x2="35%" y2="75%" class="topology-line" />
-                            <line x1="30%" y1="45%" x2="45%" y2="75%" class="topology-line" />
-                            <line x1="30%" y1="45%" x2="55%" y2="75%" class="topology-line" />
+                            <svg class="absolute inset-0 w-full h-full pointer-events-none">
+                                <!-- Fiber Lines -->
+                                <line x1="50%" y1="15%" x2="30%" y2="40%" class="topology-line" />
+                                <line x1="50%" y1="15%" x2="70%" y2="40%" class="topology-line" />
+                                
+                                <!-- Mesh Cluster Alpha -->
+                                <circle cx="30%" cy="40%" r="4" fill="#3b82f6" opacity="0.5" />
+                                <line x1="30%" y1="40%" x2="15%" y2="70%" class="topology-line" />
+                                <line x1="30%" y1="40%" x2="25%" y2="70%" class="topology-line" />
+                                <line x1="30%" y1="40%" x2="35%" y2="70%" class="topology-line" />
+                                <line x1="30%" y1="40%" x2="45%" y2="70%" class="topology-line" />
+                                <line x1="30%" y1="40%" x2="55%" y2="70%" class="topology-line" />
 
-                            <!-- Cluster 2 APs -->
-                            <line x1="70%" y1="45%" x2="65%" y2="75%" class="topology-line" />
-                            <line x1="70%" y1="45%" x2="75%" y2="75%" class="topology-line" />
-                            <line x1="70%" y1="45%" x2="85%" y2="75%" class="topology-line" />
-                            <line x1="70%" y1="45%" x2="93%" y2="75%" class="topology-line" />
-                            <line x1="70%" y1="45%" x2="80%" y2="88%" class="topology-line" />
-                        </svg>
+                                <!-- Mesh Cluster Bravo -->
+                                <circle cx="70%" cy="40%" r="4" fill="#3b82f6" opacity="0.5" />
+                                <line x1="70%" y1="40%" x2="65%" y2="70%" class="topology-line" />
+                                <line x1="70%" y1="40%" x2="75%" y2="70%" class="topology-line" />
+                                <line x1="70%" y1="40%" x2="85%" y2="70%" class="topology-line" />
+                                <line x1="70%" y1="40%" x2="93%" y2="70%" class="topology-line" />
+                                <line x1="70%" y1="40%" x2="80%" y2="85%" class="topology-line" />
+                            </svg>
 
-                        <!-- Main Cloud Server -->
-                        <div class="absolute top-[10%] left-1/2 -translate-x-1/2 flex flex-col items-center">
-                            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/40 border border-white/20">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>
+                            <!-- Nodes -->
+                            <!-- Core -->
+                            <div class="absolute top-[15%] left-1/2 -translate-x-1/2 group">
+                                <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/30 border border-white/20">
+                                    <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>
+                                </div>
+                                <div class="absolute top-16 left-1/2 -translate-x-1/2 text-center w-max">
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-white">Main Core</p>
+                                    <p class="text-[8px] mono text-emerald-500">PRIMARY_UPLINK_ON</p>
+                                </div>
                             </div>
-                            <span class="mt-3 font-bold text-xs uppercase tracking-tighter">Asher-Link Core</span>
+
+                            <!-- Clusters -->
+                            <div class="absolute top-[40%] left-[30%] -translate-x-1/2">
+                                <div class="w-10 h-10 bg-zinc-900 rounded-xl border border-blue-500/30 flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                                </div>
+                                <span class="absolute top-11 left-1/2 -translate-x-1/2 text-[8px] font-bold text-zinc-500">ALPHA_F</span>
+                            </div>
+
+                            <div class="absolute top-[40%] left-[70%] -translate-x-1/2">
+                                <div class="w-10 h-10 bg-zinc-900 rounded-xl border border-blue-500/30 flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                                </div>
+                                <span class="absolute top-11 left-1/2 -translate-x-1/2 text-[8px] font-bold text-zinc-500">BRAVO_K</span>
+                            </div>
+
+                            <!-- Interactive Access Points (Generating 10) -->
+                            <!-- Section K (Alpha) -->
+                            <div class="ap-node top-[70%] left-[15%]" style="transform: translate(-50%, -50%);">
+                                <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div></div>
+                                <div class="ap-tooltip">
+                                    <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-1">
+                                        <span class="text-white font-bold">AP_F01</span>
+                                        <span class="text-[8px] text-emerald-500">UP</span>
+                                    </div>
+                                    <div class="space-y-1 text-[10px] text-zinc-400">
+                                        <p>Users: <span class="text-white">142</span></p>
+                                        <p>RSSI: <span class="text-emerald-500">-52 dBm</span></p>
+                                        <p>SNR: <span class="text-white">32 dB</span></p>
+                                        <p>Uptime: <span class="text-white">14d 2h</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ap-node top-[70%] left-[25%]">
+                                <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div></div>
+                                <div class="ap-tooltip"><span class="text-white font-bold">AP_F02</span><br>Users: 89<br>Signal: Excellent</div>
+                            </div>
+                            <div class="ap-node top-[70%] left-[35%]">
+                                <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div></div>
+                                <div class="ap-tooltip"><span class="text-white font-bold">AP_F03</span><br>Users: 156<br>Signal: Good</div>
+                            </div>
+                            <!-- Node with Warning Example -->
+                            <div class="ap-node top-[70%] left-[45%]">
+                                <div class="w-6 h-6 bg-amber-500/20 rounded border border-amber-500/40 flex items-center justify-center node-warning">
+                                    <div class="w-1.5 h-1.5 bg-amber-500 rounded-full"></div>
+                                    <div class="absolute status-pulse w-full h-full bg-amber-500/40 rounded"></div>
+                                </div>
+                                <div class="ap-tooltip"><span class="text-amber-500 font-bold">AP_F04 (Alert)</span><br>Users: 112<br>Status: High Interference</div>
+                            </div>
+                            <div class="ap-node top-[70%] left-[55%]">
+                                <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div></div>
+                                <div class="ap-tooltip"><span class="text-white font-bold">AP_F05</span><br>Users: 94<br>Signal: Good</div>
+                            </div>
+
+                            <!-- Section L (Bravo) -->
+                            <div class="ap-node top-[70%] left-[65%]">
+                                <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div></div>
+                                <div class="ap-tooltip"><span class="text-white font-bold">AP_K01</span><br>Users: 210<br>High Density Zone</div>
+                            </div>
+                            <div class="ap-node top-[70%] left-[75%]">
+                                <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div></div>
+                                <div class="ap-tooltip"><span class="text-white font-bold">AP_K02</span><br>Users: 178</div>
+                            </div>
+                            <div class="ap-node top-[70%] left-[85%]">
+                                <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div></div>
+                                <div class="ap-tooltip"><span class="text-white font-bold">AP_K03</span><br>Users: 133</div>
+                            </div>
+                            <div class="ap-node top-[70%] left-[93%]">
+                                <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div></div>
+                                <div class="ap-tooltip"><span class="text-white font-bold">AP_K04</span><br>Users: 164</div>
+                            </div>
+                            <div class="ap-node top-[85%] left-[80%]">
+                                <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div></div>
+                                <div class="ap-tooltip"><span class="text-white font-bold">AP_K05</span><br>Users: 142</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spectrum Management & Active Tasks -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="glass-panel p-6 rounded-3xl">
+                            <h4 class="font-bold mb-4 flex items-center gap-2">
+                                <svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Recent Events
+                            </h4>
+                            <div class="space-y-4 max-h-[250px] overflow-y-auto custom-scrollbar pr-2">
+                                <div class="flex gap-4 p-3 rounded-xl bg-white/5 border border-white/5">
+                                    <div class="w-1 h-8 bg-blue-500 rounded-full"></div>
+                                    <div>
+                                        <p class="text-xs font-bold">Firmware Update Pushed</p>
+                                        <p class="text-[10px] text-zinc-500">AP_K01 thru AP_K05 successful • 2m ago</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4 p-3 rounded-xl bg-white/5 border border-white/5">
+                                    <div class="w-1 h-8 bg-amber-500 rounded-full"></div>
+                                    <div>
+                                        <p class="text-xs font-bold text-amber-500">DFS Interference Detected</p>
+                                        <p class="text-[10px] text-zinc-500">Cluster Alpha shifted to Ch 104 • 15m ago</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4 p-3 rounded-xl bg-white/5 border border-white/5">
+                                    <div class="w-1 h-8 bg-emerald-500 rounded-full"></div>
+                                    <div>
+                                        <p class="text-xs font-bold">Voucher Batch Generated</p>
+                                        <p class="text-[10px] text-zinc-500">1,000 x 1GB Daily Vouchers • 1h ago</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- 2 Clusters -->
-                        <div class="absolute top-[45%] left-[30%] -translate-x-1/2 flex flex-col items-center">
-                            <div class="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center border border-zinc-700 shadow-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                            </div>
-                            <span class="mt-2 text-[10px] font-bold text-zinc-400">Cluster ALPHA</span>
+                        <div class="glass-panel p-6 rounded-3xl">
+                            <h4 class="font-bold mb-4 flex items-center gap-2">
+                                <svg class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                                Signal Distribution
+                            </h4>
+                            <canvas id="signalChart" height="200"></canvas>
                         </div>
-
-                        <div class="absolute top-[45%] left-[70%] -translate-x-1/2 flex flex-col items-center">
-                            <div class="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center border border-zinc-700 shadow-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                            </div>
-                            <span class="mt-2 text-[10px] font-bold text-zinc-400">Cluster BRAVO</span>
-                        </div>
-
-                        <!-- 10 Street APs with Hover Data -->
-                        <!-- Cluster Alpha APs -->
-                        <div class="ap-node top-[75%] left-[15%]" style="transform: translateX(-50%);">
-                            <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="ap-tooltip">AP_K01: 142 Users</div>
-                        </div>
-                        <div class="ap-node top-[75%] left-[25%]" style="transform: translateX(-50%);">
-                            <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="ap-tooltip">AP_K02: 89 Users</div>
-                        </div>
-                        <div class="ap-node top-[75%] left-[35%]" style="transform: translateX(-50%);">
-                            <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="ap-tooltip">AP_K03: 156 Users</div>
-                        </div>
-                        <div class="ap-node top-[75%] left-[45%]" style="transform: translateX(-50%);">
-                            <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="ap-tooltip">AP_K04: 112 Users</div>
-                        </div>
-                        <div class="ap-node top-[75%] left-[55%]" style="transform: translateX(-50%);">
-                            <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="ap-tooltip">AP_K05: 94 Users</div>
-                        </div>
-
-                        <!-- Cluster Bravo APs -->
-                        <div class="ap-node top-[75%] left-[65%]" style="transform: translateX(-50%);">
-                            <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="ap-tooltip">AP_L01: 210 Users</div>
-                        </div>
-                        <div class="ap-node top-[75%] left-[75%]" style="transform: translateX(-50%);">
-                            <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="ap-tooltip">AP_L02: 178 Users</div>
-                        </div>
-                        <div class="ap-node top-[75%] left-[85%]" style="transform: translateX(-50%);">
-                            <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="ap-tooltip">AP_L03: 133 Users</div>
-                        </div>
-                        <div class="ap-node top-[75%] left-[93%]" style="transform: translateX(-50%);">
-                            <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="ap-tooltip">AP_L04: 164 Users</div>
-                        </div>
-                        <div class="ap-node top-[88%] left-[80%]" style="transform: translateX(-50%);">
-                            <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
-                                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                            </div>
-                            <div class="ap-tooltip">AP_L05: 142 Users</div>
-                        </div>
-
                     </div>
                 </div>
 
-                <!-- Cluster Monitoring -->
-                <div class="lg:col-span-4 space-y-6">
-                    <h3 class="text-xl font-bold">Cluster Health</h3>
+                <!-- Right Control Panel (Security & Clients) -->
+                <div class="lg:col-span-4 space-y-8">
                     
-                    <div class="space-y-4">
-                        <div class="glass-panel p-5 rounded-2xl border-l-4 border-blue-500">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h4 class="font-bold">ALPHA Cluster</h4>
-                                    <p class="text-[10px] text-zinc-500">Section K Street Nodes</p>
-                                </div>
-                                <span class="px-2 py-1 rounded bg-blue-500/10 text-blue-400 text-[10px] font-bold">5 APs</span>
-                            </div>
-                            <div class="space-y-3">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-zinc-500">Peak Load</span>
-                                    <span>820 Mbps</span>
-                                </div>
-                                <div class="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                                    <div class="bg-blue-500 h-full w-[65%]"></div>
-                                </div>
-                            </div>
+                    <!-- Traffic Monitoring -->
+                    <div class="glass-panel p-6 rounded-3xl border border-white/10">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-bold">Real-time Load</h3>
+                            <span class="text-[10px] mono text-blue-400">SYNCING LIVE</span>
                         </div>
-
-                        <div class="glass-panel p-5 rounded-2xl border-l-4 border-indigo-500">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h4 class="font-bold">BRAVO Cluster</h4>
-                                    <p class="text-[10px] text-zinc-500">Section L Street Nodes</p>
-                                </div>
-                                <span class="px-2 py-1 rounded bg-indigo-500/10 text-indigo-400 text-[10px] font-bold">5 APs</span>
+                        <canvas id="trafficChart" height="240"></canvas>
+                        <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div class="bg-white/5 p-3 rounded-xl text-center">
+                                <p class="text-[10px] text-zinc-500 uppercase font-bold">Download</p>
+                                <p class="text-xl font-bold text-blue-500">1.8 <span class="text-xs">Gbps</span></p>
                             </div>
-                            <div class="space-y-3">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-zinc-500">Peak Load</span>
-                                    <span>1.1 Gbps</span>
-                                </div>
-                                <div class="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-                                    <div class="bg-indigo-500 h-full w-[88%]"></div>
-                                </div>
+                            <div class="bg-white/5 p-3 rounded-xl text-center">
+                                <p class="text-[10px] text-zinc-500 uppercase font-bold">Upload</p>
+                                <p class="text-xl font-bold text-indigo-500">640 <span class="text-xs">Mbps</span></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="glass-panel p-6 rounded-2xl">
-                        <h4 class="text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4">Regional Traffic</h4>
-                        <canvas id="usageChart" height="200"></canvas>
+                    <!-- Client Insights -->
+                    <div class="glass-panel p-6 rounded-3xl border border-white/10">
+                        <h3 class="font-bold mb-4">Top Consumers</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center"><svg class="h-4 w-4 text-zinc-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></div>
+                                    <div>
+                                        <p class="text-xs font-bold">MAC: ..6E:AF</p>
+                                        <p class="text-[10px] text-zinc-500">AP_L01 • Samsung S21</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-bold text-blue-400">14.2 GB</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center"><svg class="h-4 w-4 text-zinc-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></div>
+                                    <div>
+                                        <p class="text-xs font-bold">MAC: ..1F:32</p>
+                                        <p class="text-[10px] text-zinc-500">AP_K03 • Huawei P40</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-bold text-blue-400">9.8 GB</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-6 py-3 rounded-xl bg-white/5 border border-white/5 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all">View All 1,420 Clients</button>
+                    </div>
+
+                    <!-- Environment Health -->
+                    <div class="glass-panel p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/10">
+                        <h3 class="font-bold text-emerald-500 text-sm mb-4">Security Baseline</h3>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin-slow"></div>
+                            <div>
+                                <p class="text-xs font-bold">Threat Defense: ACTIVE</p>
+                                <p class="text-[10px] text-zinc-500">No malicious handshakes detected in 48h</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -378,7 +476,6 @@
             const loginForm = document.getElementById('loginForm');
             const loginSection = document.getElementById('loginSection');
             const dashboardSection = document.getElementById('dashboardSection');
-            const logoutBtn = document.getElementById('logoutBtn');
 
             loginForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -390,33 +487,52 @@
                     dashboardSection.classList.remove('hidden-section');
                     dashboardSection.classList.add('active-section');
                     initCharts();
-                }, 600);
-            });
-
-            logoutBtn.addEventListener('click', () => {
-                location.reload();
+                }, 700);
             });
 
             function initCharts() {
-                const ctx = document.getElementById('usageChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
+                // Traffic Load Chart
+                const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+                new Chart(trafficCtx, {
+                    type: 'line',
                     data: {
-                        labels: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
+                        labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
                         datasets: [{
-                            label: 'GB Used',
-                            data: [120, 190, 300, 250, 420, 680],
-                            backgroundColor: '#3b82f6',
-                            borderRadius: 4
+                            data: [65, 59, 80, 81, 56, 55, 40, 70, 95, 120],
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                            pointRadius: 0
                         }]
                     },
                     options: {
                         responsive: true,
                         plugins: { legend: { display: false } },
                         scales: {
-                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#71717a' } },
-                            x: { grid: { display: false }, ticks: { color: '#71717a' } }
+                            y: { display: false },
+                            x: { grid: { display: false }, ticks: { display: false } }
                         }
+                    }
+                });
+
+                // Signal Distribution Chart
+                const signalCtx = document.getElementById('signalChart').getContext('2d');
+                new Chart(signalCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Excellent', 'Good', 'Fair', 'Poor'],
+                        datasets: [{
+                            data: [60, 25, 10, 5],
+                            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                            borderWidth: 0,
+                            cutout: '80%'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom', labels: { color: '#71717a', font: { size: 10 } } } }
                     }
                 });
             }
