@@ -58,6 +58,41 @@
             transform: translateY(0);
         }
 
+        /* Tooltip styling */
+        .ap-node {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .ap-node:hover {
+            transform: scale(1.2);
+            z-index: 50;
+        }
+
+        .ap-tooltip {
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .ap-node:hover .ap-tooltip {
+            opacity: 1;
+        }
+
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
@@ -75,7 +110,7 @@
                     </svg>
                 </div>
                 <h1 class="text-3xl font-bold tracking-tight text-white">Asher-Link</h1>
-                <p class="text-zinc-500 mt-2 font-light">Link Console</p>
+                <p class="text-zinc-500 mt-2 font-light">Network Console</p>
             </div>
 
             <form id="loginForm" class="space-y-5">
@@ -140,8 +175,8 @@
             <!-- Botshabelo Stats -->
             <header class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight">Link</h2>
-                    <p class="text-zinc-500">Managing 2 Clusters & 10 Active Access Points</p>
+                    <h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
+                    <p class="text-zinc-500">Main Network</p>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="glass-panel px-6 py-3 rounded-xl border-emerald-500/20">
@@ -176,23 +211,22 @@
                     
                     <div class="glass-panel rounded-3xl p-4 lg:p-10 relative overflow-hidden h-[550px] border border-white/5">
                         <svg class="absolute inset-0 w-full h-full pointer-events-none">
-                            <!-- Cluster Connections -->
                             <line x1="50%" y1="15%" x2="30%" y2="45%" class="topology-line" />
                             <line x1="50%" y1="15%" x2="70%" y2="45%" class="topology-line" />
                             
-                            <!-- AP Connections (Cluster 1) -->
+                            <!-- Cluster 1 APs -->
                             <line x1="30%" y1="45%" x2="15%" y2="75%" class="topology-line" />
                             <line x1="30%" y1="45%" x2="25%" y2="75%" class="topology-line" />
                             <line x1="30%" y1="45%" x2="35%" y2="75%" class="topology-line" />
                             <line x1="30%" y1="45%" x2="45%" y2="75%" class="topology-line" />
                             <line x1="30%" y1="45%" x2="55%" y2="75%" class="topology-line" />
 
-                            <!-- AP Connections (Cluster 2) -->
+                            <!-- Cluster 2 APs -->
                             <line x1="70%" y1="45%" x2="65%" y2="75%" class="topology-line" />
                             <line x1="70%" y1="45%" x2="75%" y2="75%" class="topology-line" />
                             <line x1="70%" y1="45%" x2="85%" y2="75%" class="topology-line" />
-                            <line x1="70%" y1="45%" x2="90%" y2="75%" class="topology-line" />
-                            <line x1="70%" y1="45%" x2="80%" y2="85%" class="topology-line" />
+                            <line x1="70%" y1="45%" x2="93%" y2="75%" class="topology-line" />
+                            <line x1="70%" y1="45%" x2="80%" y2="88%" class="topology-line" />
                         </svg>
 
                         <!-- Main Cloud Server -->
@@ -218,56 +252,69 @@
                             <span class="mt-2 text-[10px] font-bold text-zinc-400">Cluster BRAVO</span>
                         </div>
 
-                        <!-- 10 Street APs (Positioned roughly) -->
-                        <div class="absolute top-[75%] left-[15%] flex flex-col items-center">
+                        <!-- 10 Street APs with Hover Data -->
+                        <!-- Cluster Alpha APs -->
+                        <div class="ap-node top-[75%] left-[15%]" style="transform: translateX(-50%);">
                             <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
                                 <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                             </div>
+                            <div class="ap-tooltip">AP_K01: 142 Users</div>
                         </div>
-                        <div class="absolute top-[75%] left-[25%] flex flex-col items-center">
+                        <div class="ap-node top-[75%] left-[25%]" style="transform: translateX(-50%);">
                             <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
                                 <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                             </div>
+                            <div class="ap-tooltip">AP_K02: 89 Users</div>
                         </div>
-                        <div class="absolute top-[75%] left-[35%] flex flex-col items-center">
+                        <div class="ap-node top-[75%] left-[35%]" style="transform: translateX(-50%);">
                             <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
                                 <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                             </div>
+                            <div class="ap-tooltip">AP_K03: 156 Users</div>
                         </div>
-                        <div class="absolute top-[75%] left-[45%] flex flex-col items-center">
+                        <div class="ap-node top-[75%] left-[45%]" style="transform: translateX(-50%);">
                             <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
                                 <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                             </div>
+                            <div class="ap-tooltip">AP_K04: 112 Users</div>
                         </div>
-                        <div class="absolute top-[75%] left-[55%] flex flex-col items-center">
+                        <div class="ap-node top-[75%] left-[55%]" style="transform: translateX(-50%);">
                             <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
                                 <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                             </div>
+                            <div class="ap-tooltip">AP_K05: 94 Users</div>
                         </div>
-                        <div class="absolute top-[75%] left-[65%] flex flex-col items-center">
+
+                        <!-- Cluster Bravo APs -->
+                        <div class="ap-node top-[75%] left-[65%]" style="transform: translateX(-50%);">
                             <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
                                 <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                             </div>
+                            <div class="ap-tooltip">AP_L01: 210 Users</div>
                         </div>
-                        <div class="absolute top-[75%] left-[75%] flex flex-col items-center">
+                        <div class="ap-node top-[75%] left-[75%]" style="transform: translateX(-50%);">
                             <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
                                 <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                             </div>
+                            <div class="ap-tooltip">AP_L02: 178 Users</div>
                         </div>
-                        <div class="absolute top-[75%] left-[85%] flex flex-col items-center">
+                        <div class="ap-node top-[75%] left-[85%]" style="transform: translateX(-50%);">
                             <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
                                 <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                             </div>
+                            <div class="ap-tooltip">AP_L03: 133 Users</div>
                         </div>
-                        <div class="absolute top-[75%] left-[92%] flex flex-col items-center">
+                        <div class="ap-node top-[75%] left-[93%]" style="transform: translateX(-50%);">
                             <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
                                 <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                             </div>
+                            <div class="ap-tooltip">AP_L04: 164 Users</div>
                         </div>
-                        <div class="absolute top-[85%] left-[80%] flex flex-col items-center">
+                        <div class="ap-node top-[88%] left-[80%]" style="transform: translateX(-50%);">
                             <div class="w-6 h-6 bg-emerald-500/20 rounded border border-emerald-500/40 flex items-center justify-center node-active">
                                 <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
                             </div>
+                            <div class="ap-tooltip">AP_L05: 142 Users</div>
                         </div>
 
                     </div>
@@ -318,7 +365,7 @@
                     </div>
 
                     <div class="glass-panel p-6 rounded-2xl">
-                        <h4 class="text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4">Network Consumption</h4>
+                        <h4 class="text-sm font-bold uppercase tracking-widest text-zinc-500 mb-4">Regional Traffic</h4>
                         <canvas id="usageChart" height="200"></canvas>
                     </div>
                 </div>
